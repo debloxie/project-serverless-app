@@ -1,0 +1,1 @@
+# boto3 is available in Lambda runtime by default, so we don't need to package it.
