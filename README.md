@@ -1,5 +1,5 @@
 # project-serverless-app PROJECT
-Serverless Python CRUD application with CI/CD using Github Actions
+Serverless Python CRUD application with CI/CD using Github Actions and Monitoring/Observability
 
 ---
 
