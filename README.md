@@ -63,24 +63,24 @@ project-serverless-app/
 │
 ├── app/
 │   ├── handlers/
-│   │   ├── create.py
-│   │   ├── read.py
-│   │   ├── update.py
-│   │   ├── delete.py
-│   │   └── utils.py
+│   │   ├── create.py          # Unified CRUD Lambda with structured logging
+│   │   ├── health.py          # Health check Lambda endpoint
+│   │   └── utils.py           # DynamoDB helper functions
+│   ├── requirements.txt       # Python dependencies for Lambda packaging
 │   └── __init__.py
 │
 ├── terraform/
 │   └── dev/
-│       ├── main.tf
-│       ├── variables.tf
-│       ├── outputs.tf
-│       └── terraform.tfvars
+│       ├── main.tf            # API Gateway, Lambda, DynamoDB, IAM
+│       ├── monitoring.tf      # CloudWatch alarms (Lambda errors)
+│       ├── variables.tf       # Input variables
+│       ├── outputs.tf         # API URL + resource outputs
+│       ├── versions.tf        # Terraform + provider versions
+│       └── terraform.tfvars   # Environment-specific values
 │
 └── .github/
     └── workflows/
-        └── deploy.yml
-```
+        └── deploy.yml         # CI/CD pipeline (Terraform Init/Plan/Apply)
 
 ---
 
@@ -180,10 +180,73 @@ curl -X PUT "$API_URL/items/<id>" \
   -d '{"name": "Updated", "description": "Updated description"}'
 ```
 
-### 🔹 **Delete an item**
+### 🔹 **Delete an item** Monitoring & Observability
 
 ```bash
 curl -X DELETE "$API_URL/items/<id>"
+
+MONITORING & OBSERVABILITY
+ 
+This project includes lightweight, zero‑cost observability features similar to real production systems.
+
+1. Health Check Endpoint
+A dedicated health endpoint verifies API uptime and deployment status.
+Endpoint:
+
+GET /health
+
+
+Example:
+
+curl "https://YOUR-API-ID.execute-api.us-east-1.amazonaws.com/dev/health"
+
+
+Sample Response:
+
+{
+  "status": "ok",
+  "timestamp": 1700000000
+}
+
+
+STRUCTURED LOGGING (CloudWatch Logs)
+
+All Lambda functions use structured JSON logging:
+{
+  "action": "create_item",
+  "status": "success",
+  "item_name": "Television",
+  "timestamp": 1700000000
+}
+
+
+Benefits:
+- Easy filtering in CloudWatch Logs
+- Clear operational visibility
+- Production‑grade debugging patterns
+
+CLOUDWATCH ALARM FOR LAMBDA ERRORS
+
+A CloudWatch alarm monitors Lambda failures:
+
+This helps detect issues immediately.
+
+CLOUDWATCH LOGS INSIGHTS QUERIES
+
+Use these queries to analyze API behavior.
+🔹 Recent Errors
+fields @timestamp, @message
+| filter @message like /"status":"error"/ or @message like /ERROR/
+| sort @timestamp desc
+| limit 50
+
+
+🔹 Latency Distribution
+fields @timestamp, @duration
+| stats avg(@duration), max(@duration), pct(@duration, 95) by bin(1h)
+| sort bin(1h) desc
+
+
 ```
 
 ---
@@ -237,16 +300,6 @@ This project uses a dedicated IAM user:
 - Access keys stored in GitHub Secrets  
 - No hardcoded credentials  
 
----
-
-## 📈 **Future Enhancements**
-
-- Add `/health` endpoint  
-- Add CloudWatch alarms  
-- Add S3 static frontend  
-- Add production workspace (`prod`)  
-- Add API key authentication  
-- Add logging middleware  
 
 ---
 

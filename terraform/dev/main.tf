@@ -268,3 +268,12 @@ resource "aws_api_gateway_deployment" "crud_deployment" {
     aws_api_gateway_integration.delete_item_integration
   ]
 }
+
+##############################
+#API HEALTH MONITORING ROUTE
+##############################
+resource "aws_apigatewayv2_route" "health" {
+  api_id    = aws_apigatewayv2_api.http_api.id
+  route_key = "GET /health"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
