@@ -146,6 +146,12 @@ Example:
 https://abc123.execute-api.us-east-1.amazonaws.com/dev
 ```
 
+## Live API Endpoint
+https://ofa40fsjk7.execute-api.us-east-1.amazonaws.com/dev/
+
+You can test the API using:
+curl "$API_URL/items"
+
 ### 🔹 **Create an item**
 
 ```bash
