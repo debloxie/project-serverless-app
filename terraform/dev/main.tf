@@ -275,10 +275,19 @@ resource "aws_lambda_permission" "apigw_invoke" {
 
 resource "aws_api_gateway_deployment" "crud_deployment" {
   rest_api_id = aws_api_gateway_rest_api.crud_api.id
-  stage_name  = var.environment
+
+  # Modern pattern: no stage_name here
+  # Stage is now created separately using aws_api_gateway_stage
 
   triggers = {
-    redeploy = sha1(jsonencode(aws_api_gateway_rest_api.crud_api))
+    redeploy = sha1(jsonencode([
+      aws_api_gateway_integration.post_item_integration.id,
+      aws_api_gateway_integration.get_items_integration.id,
+      aws_api_gateway_integration.get_item_integration.id,
+      aws_api_gateway_integration.put_item_integration.id,
+      aws_api_gateway_integration.delete_item_integration.id,
+      aws_api_gateway_integration.health_get_integration.id
+    ]))
   }
 
   depends_on = [
@@ -289,5 +298,11 @@ resource "aws_api_gateway_deployment" "crud_deployment" {
     aws_api_gateway_integration.delete_item_integration,
     aws_api_gateway_integration.health_get_integration
   ]
+}
+
+resource "aws_api_gateway_stage" "crud_stage" {
+  rest_api_id   = aws_api_gateway_rest_api.crud_api.id
+  deployment_id = aws_api_gateway_deployment.crud_deployment.id
+  stage_name    = var.environment
 }
 

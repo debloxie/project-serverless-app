@@ -45,6 +45,8 @@ def lambda_handler(event, context):
 
         elif http_method == "GET" and path.endswith("/items"):
             return handle_list(event)
+        elif http_method == "GET" and path.endswith("/health"):
+            return handle_health(event)
 
         else:
             log("router", "error", reason="unsupported_route")
@@ -166,4 +168,17 @@ def handle_list(event):
     return {
         "statusCode": 200,
         "body": json.dumps(items)
+    }
+
+#### ------------------------
+# HEALTH HANDLER
+#### -------------------------
+def handle_health(event):
+    log("health_check", "success")
+    return {
+        "statusCode": 200,
+        "body": json.dumps({
+            "status": "ok",
+            "timestamp": int(time.time())
+        })
     }

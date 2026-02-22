@@ -12,6 +12,7 @@ A fully serverless CRUD API built on AWS using:
 - **DynamoDB (NoSQL)**
 - **Terraform (Infrastructure as Code)**
 - **GitHub Actions (CI/CD)**
+- **CloudWatch/CloudWatch Logs
 
 This project demonstrates real‑world cloud engineering skills including IaC, serverless architecture, automated deployments, and API design.  
 Recruiters, engineers, and hiring managers can deploy, test, and extend this API easily.
